@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lamplit Nook</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1208;
+    --vellum: #f5edd8;
+    --parchment: #ede0c0;
+    --amber: #b8860b;
+    --ember: #8b3a0f;
+    --ash: #6b6050;
+    --smoke: #c9bfa8;
+    --gold: #d4a017;
+    --cream: #faf5e8;
+    --border-thin: 1px solid #c9a84c44;
+    --border-glow: 1px solid #c9a84c88;
+  }
+
+  body {
+    background: var(--ink);
+    color: var(--vellum);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.8;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, #2a1a0844 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, #1a0a0244 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { text-decoration: underline; color: #f0c040; }
+
+  .page-wrap { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+
+  /* HEADER */
+  .site-header {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    border-bottom: 1px solid #c9a84c55;
+    position: relative;
+  }
+  .site-header::before, .site-header::after {
+    content: '✦';
+    position: absolute;
+    top: 50%;
+    color: var(--gold);
+    opacity: 0.4;
+    font-size: 1.2rem;
+  }
+  .site-header::before { left: 1rem; }
+  .site-header::after { right: 1rem; }
+
+  .site-title {
+    font-family: 'IM Fell English SC', Georgia, serif;
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 40px #d4a01755, 0 2px 4px #00000088;
+    margin-bottom: 0.3rem;
+  }
+  .site-tagline {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic;
+    color: var(--smoke);
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 1.2rem;
+  }
+  .discord-btn {
+    display: inline-block;
+    background: #5865f244;
+    border: 1px solid #5865f2aa;
+    color: #a8b3ff;
+    padding: 0.45rem 1.4rem;
+    border-radius: 2px;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    font-family: 'Lora', serif;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+  .discord-btn:hover { background: #5865f266; text-decoration: none; color: #c0caff; }
+
+  /* NAV */
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.2rem 0;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #c9a84c33;
+  }
+  nav a {
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    color: var(--smoke);
+    padding: 0.25rem 0.9rem;
+    border-right: 1px solid #c9a84c33;
+    transition: color 0.2s;
+  }
+  nav a:last-child { border-right: none; }
+  nav a:hover { color: var(--gold); text-decoration: none; }
+
+  /* DIVIDER */
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    opacity: 0.5;
+    font-size: 1.1rem;
+    margin: 1.5rem 0;
+    letter-spacing: 0.5rem;
+    user-select: none;
+  }
+
+  /* SECTIONS */
+  section { margin-bottom: 3.5rem; scroll-margin-top: 1rem; }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+  .section-head h2 {
+    font-family: 'IM Fell English SC', Georgia, serif;
+    font-size: 1.35rem;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    font-weight: normal;
+  }
+  .section-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, #c9a84c44, transparent);
+  }
+  .section-icon { font-size: 1.1rem; opacity: 0.7; }
+
+  .prose {
+    color: #d8cbb0;
+    font-size: 0.95rem;
+    line-height: 1.85;
+    max-width: 680px;
+  }
+  .prose p { margin-bottom: 0.8rem; }
+
+  /* CARDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .card {
+    background: #1e150844;
+    border: 1px solid #c9a84c33;
+    border-radius: 1px;
+    padding: 1rem 1.1rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .card:hover { border-color: #c9a84c66; background: #1e150866; }
+  .card-label {
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    margin-bottom: 0.4rem;
+    opacity: 0.8;
+  }
+  .card-title { font-size: 0.95rem; color: var(--vellum); margin-bottom: 0.3rem; font-weight: 600; }
+  .card-sub { font-size: 0.8rem; color: var(--ash); font-style: italic; }
+
+  /* BOOK LIST */
+  .book-entry {
+    display: flex;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid #c9a84c22;
+    align-items: flex-start;
+  }
+  .book-entry:last-child { border-bottom: none; }
+  .book-cover {
+    width: 48px;
+    min-width: 48px;
+    height: 68px;
+    background: #2a1a08;
+    border: 1px solid #c9a84c44;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .book-title { font-size: 0.95rem; color: var(--vellum); font-weight: 600; }
+  .book-author { font-size: 0.8rem; color: var(--ash); margin: 0.1rem 0; }
+  .book-note { font-size: 0.82rem; color: #c9bfa8aa; font-style: italic; }
+
+  /* FORUM THREADS */
+  .thread {
+    padding: 0.8rem 0.9rem;
+    border-left: 2px solid #c9a84c33;
+    margin-bottom: 0.6rem;
+    background: #1e150822;
+    transition: border-color 0.2s;
+  }
+  .thread:hover { border-left-color: #c9a84c88; }
+  .thread-title { font-size: 0.92rem; color: var(--vellum); margin-bottom: 0.2rem; }
+  .thread-meta { font-size: 0.75rem; color: var(--ash); }
+  .thread-meta span { color: #c9a84caa; }
+
+  /* ARCELIO'S NOVELS */
+  .talk {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 0.9rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid #c9a84c22;
+    align-items: start;
+  }
+  .talk:last-child { border-bottom: none; }
+  .talk-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #2a1a08;
+    border: 1px solid #c9a84c55;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    overflow: hidden;
+  }
+  .talk-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .talk-name { font-size: 0.95rem; color: var(--gold); font-family: 'IM Fell English SC', serif; }
+  .talk-desc { font-size: 0.82rem; color: #c9bfa8bb; margin-top: 0.2rem; font-style: italic; }
+  .talk-topic { font-size: 0.85rem; color: var(--vellum); margin-top: 0.3rem; }
+
+  /* MC SERVER */
+  .server-box {
+    background: #0e0e0e55;
+    border: 1px solid #c9a84c44;
+    padding: 1.2rem 1.4rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.82rem;
+    color: #a0d080;
+    border-radius: 1px;
+    margin-top: 0.8rem;
+    position: relative;
+  }
+  .server-box .label {
+    position: absolute;
+    top: -0.55rem;
+    left: 0.8rem;
+    background: var(--ink);
+    padding: 0 0.4rem;
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+  }
+  .server-stat { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+  .server-stat .key { color: #888; }
+  .server-stat .val { color: #a0d080; }
+  .copy-ip {
+    margin-top: 0.8rem;
+    display: inline-block;
+    background: #1a2a1044;
+    border: 1px solid #a0d08044;
+    color: #a0d080;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: background 0.2s;
+    font-family: 'Courier New', monospace;
+  }
+  .copy-ip:hover { background: #1a2a1088; }
+
+  /* IMAGE PLACEHOLDER */
+  .img-placeholder {
+    width: 100%;
+    max-width: 480px;
+    height: 160px;
+    background: #1e150844;
+    border: 1px dashed #c9a84c55;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c9a84c66;
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    margin-top: 0.8rem;
+    border-radius: 1px;
+    overflow: hidden;
+    position: relative;
+  }
+  .img-placeholder img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .img-placeholder span { position: relative; z-index: 1; }
+
+  /* PASSWORD MODAL */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #00000088;
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-box {
+    background: #12090288;
+    border: 1px solid #c9a84c66;
+    padding: 2rem;
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    border-radius: 2px;
+  }
+  .modal-title {
+    font-family: 'IM Fell English SC', serif;
+    color: var(--gold);
+    font-size: 1.05rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+    font-weight: normal;
+  }
+  .modal-sub {
+    font-size: 0.78rem;
+    color: var(--ash);
+    font-style: italic;
+    margin-bottom: 1.2rem;
+  }
+  .modal-input {
+    width: 100%;
+    background: #1a0e0466;
+    border: 1px solid #c9a84c44;
+    color: var(--vellum);
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 1px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.8rem;
+  }
+  .modal-input:focus { border-color: #c9a84c88; }
+  .modal-btn {
+    width: 100%;
+    background: #2a1505;
+    border: 1px solid #c9a84c66;
+    color: var(--gold);
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    padding: 0.55rem;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: background 0.2s;
+  }
+  .modal-btn:hover { background: #3a1f0a; }
+  .modal-cancel {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.72rem;
+    color: var(--ash);
+    cursor: pointer;
+    font-style: italic;
+    background: none;
+    border: none;
+    width: 100%;
+    font-family: 'Lora', serif;
+  }
+  .modal-cancel:hover { color: var(--smoke); }
+  .modal-error {
+    font-size: 0.75rem;
+    color: #c07060;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+    display: none;
+  }
+  .modal-error.show { display: block; }
+
+  /* EDITOR TOGGLE */
+  .editor-toggle {
+    position: fixed;
+    bottom: 1.2rem;
+    right: 1.2rem;
+    background: #1a0a02dd;
+    border: 1px solid #c9a84c88;
+    color: var(--gold);
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 0.9rem;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s;
+  }
+  .editor-toggle:hover { background: #2a150599; }
+
+  /* EDITOR PANEL */
+  .editor-panel {
+    position: fixed;
+    bottom: 0; right: 0;
+    width: min(420px, 100vw);
+    max-height: 75vh;
+    background: #0e0804ee;
+    border: 1px solid #c9a84c66;
+    border-bottom: none; border-right: none;
+    border-top-left-radius: 4px;
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(8px);
+    box-shadow: -4px -4px 24px #00000066;
+  }
+  .editor-panel.open { display: flex; }
+
+  .editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid #c9a84c33;
+  }
+  .editor-header h3 {
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.9rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    font-weight: normal;
+  }
+  .editor-header-right { display: flex; align-items: center; gap: 0.6rem; }
+  .lock-btn {
+    background: none; border: 1px solid #c9a84c33; color: var(--ash);
+    font-size: 0.7rem; font-family: 'IM Fell English SC', serif;
+    letter-spacing: 0.08em; padding: 0.2rem 0.5rem; cursor: pointer;
+    border-radius: 1px; transition: color 0.2s, border-color 0.2s;
+  }
+  .lock-btn:hover { color: #c07060; border-color: #c0706044; }
+  .editor-close {
+    background: none; border: none; color: var(--ash); cursor: pointer;
+    font-size: 1.1rem; line-height: 1; padding: 0; transition: color 0.2s;
+  }
+  .editor-close:hover { color: var(--vellum); }
+
+  .editor-tabs {
+    display: flex;
+    border-bottom: 1px solid #c9a84c22;
+    overflow-x: auto;
+  }
+  .etab {
+    padding: 0.5rem 0.9rem;
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--ash);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, background 0.2s;
+    border: none; background: none;
+  }
+  .etab.active { color: var(--gold); background: #1e150844; }
+  .etab:hover { color: var(--vellum); }
+
+  .editor-body { flex: 1; overflow-y: auto; padding: 1rem; }
+
+  .field-group { margin-bottom: 1rem; }
+  .field-label {
+    display: block;
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+    opacity: 0.8;
+  }
+  .field-input, .field-textarea {
+    width: 100%;
+    background: #1a0e0444;
+    border: 1px solid #c9a84c33;
+    color: var(--vellum);
+    font-family: 'Lora', serif;
+    font-size: 0.82rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 1px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .field-input:focus, .field-textarea:focus { border-color: #c9a84c88; }
+  .field-textarea { resize: vertical; min-height: 70px; }
+
+  .img-upload-btn {
+    display: inline-block;
+    background: #1a0e0466;
+    border: 1px dashed #c9a84c44;
+    color: #c9a84caa;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+    font-family: 'IM Fell English SC', serif;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: border-color 0.2s;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.3rem;
+  }
+  .img-upload-btn:hover { border-color: #c9a84c88; color: var(--gold); }
+  input[type=file] { display: none; }
+
+  .apply-btn {
+    width: 100%;
+    background: #2a1505;
+    border: 1px solid #c9a84c66;
+    color: var(--gold);
+    font-family: 'IM Fell English SC', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    padding: 0.55rem;
+    cursor: pointer;
+    border-radius: 1px;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+  }
+  .apply-btn:hover { background: #3a1f0a; }
+
+  .img-guide {
+    background: #1a150844;
+    border-left: 2px solid #c9a84c44;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.78rem;
+    color: #c9bfa8aa;
+    font-style: italic;
+    margin-top: 0.8rem;
+    border-radius: 0 1px 1px 0;
+  }
+
+  .tab-section { display: none; }
+  .tab-section.active { display: block; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-top: 1px solid #c9a84c22;
+    color: var(--ash);
+    font-size: 0.78rem;
+    font-style: italic;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 500px) {
+    .site-title { font-size: 2rem; }
+    nav a { font-size: 0.72rem; padding: 0.2rem 0.6rem; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="site-title" id="el-site-title">The Lamplit Nook</div>
+    <div class="site-tagline" id="el-site-tagline">A quiet corner of the internet for readers, writers, and wanderers</div>
+    <a href="#" class="discord-btn" id="el-discord-link" onclick="return false;">⚔ Join on Discord</a>
+  </header>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#minecraft">The Realm</a>
+    <a href="#books">Library</a>
+    <a href="#forum">Discussion Hall</a>
+    <a href="#writers">Arcelio's Novels</a>
+    <a href="#about">About</a>
+  </nav>
+
+  <!-- MINECRAFT -->
+  <section id="minecraft">
+    <div class="ornament">— ✦ —</div>
+    <div class="section-head">
+      <span class="section-icon">⛏</span>
+      <h2>The Realm — Minecraft Server</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="prose">
+      <p id="el-mc-desc">A survival world with light roleplay, shared builds, and a ban on griefing. Come build something that lasts. Whitelist granted in #the-gatehouse on Discord.</p>
+    </div>
+    <div class="img-placeholder" id="mc-img-wrap">
+      <img id="mc-img" src="" style="display:none">
+      <span id="mc-img-placeholder-text">[ Server Screenshot ]</span>
+    </div>
+    <div class="server-box">
+      <div class="label">Connection</div>
+      <div class="server-stat"><span class="key">Address</span><span class="val" id="el-mc-ip">play.lampletnook.net</span></div>
+      <div class="server-stat"><span class="key">Version</span><span class="val" id="el-mc-version">Java 1.21</span></div>
+      <div class="server-stat"><span class="key">Mode</span><span class="val" id="el-mc-mode">Survival / Light Roleplay</span></div>
+      <div class="server-stat"><span class="key">Status</span><span class="val">&#9679; Online</span></div>
+      <div>
+        <button class="copy-ip" onclick="navigator.clipboard.writeText(document.getElementById('el-mc-ip').textContent); this.textContent='Copied!'; setTimeout(()=>this.textContent='&#8984; Copy IP',1400)">&#8984; Copy IP</button>
+      </div>
+    </div>
+    <div class="card-grid" style="margin-top:1.2rem">
+      <div class="card"><div class="card-label">Rule I</div><div class="card-title" id="el-mc-r1">No Griefing</div><div class="card-sub">What others build is sacred.</div></div>
+      <div class="card"><div class="card-label">Rule II</div><div class="card-title" id="el-mc-r2">Whitelist Only</div><div class="card-sub">Apply in Discord first.</div></div>
+      <div class="card"><div class="card-label">Rule III</div><div class="card-title" id="el-mc-r3">Stay in Character</div><div class="card-sub">In designated RP zones.</div></div>
+    </div>
+  </section>
+
+  <!-- BOOKS -->
+  <section id="books">
+    <div class="ornament">— ✦ —</div>
+    <div class="section-head">
+      <span class="section-icon">📖</span>
+      <h2>The Library — Book Recommendations</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="prose">
+      <p id="el-books-desc">Curated by the community. These are the volumes that have shaped our conversations, our worlds, and the way we write.</p>
+    </div>
+    <div id="book-list">
+      <div class="book-entry">
+        <div class="book-cover" id="book1-cover-wrap"><img id="book1-img" src="" style="display:none"><span id="book1-emoji">📚</span></div>
+        <div class="book-info">
+          <div class="book-title" id="book1-title">The Name of the Wind</div>
+          <div class="book-author" id="book1-author">Patrick Rothfuss</div>
+          <div class="book-note" id="book1-note">Prose like a scalpel. The best first-person narrator in modern fantasy.</div>
+        </div>
+      </div>
+      <div class="book-entry">
+        <div class="book-cover" id="book2-cover-wrap"><img id="book2-img" src="" style="display:none"><span id="book2-emoji">📚</span></div>
+        <div class="book-info">
+          <div class="book-title" id="book2-title">A Gentleman in Moscow</div>
+          <div class="book-author" id="book2-author">Amor Towles</div>
+          <div class="book-note" id="book2-note">On finding a full life within constraint. Graceful and unhurried.</div>
+        </div>
+      </div>
+      <div class="book-entry">
+        <div class="book-cover" id="book3-cover-wrap"><img id="book3-img" src="" style="display:none"><span id="book3-emoji">📚</span></div>
+        <div class="book-info">
+          <div class="book-title" id="book3-title">The Left Hand of Darkness</div>
+          <div class="book-author" id="book3-author">Ursula K. Le Guin</div>
+          <div class="book-note" id="book3-note">Still the most quietly radical speculative novel ever written.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORUM -->
+  <section id="forum">
+    <div class="ornament">— ✦ —</div>
+    <div class="section-head">
+      <span class="section-icon">🗣</span>
+      <h2>Discussion Hall — Open Threads</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="prose">
+      <p id="el-forum-desc">Live threads happen in Discord. These are the evergreen topics pinned here for newcomers to find their footing.</p>
+    </div>
+    <div id="thread-list">
+      <div class="thread"><div class="thread-title" id="thread1-title">What made you fall in love with fantasy as a genre?</div><div class="thread-meta">Pinned · <span>46 replies</span></div></div>
+      <div class="thread"><div class="thread-title" id="thread2-title">Map-making: share your world maps, critique welcome</div><div class="thread-meta">Pinned · <span>23 replies</span></div></div>
+      <div class="thread"><div class="thread-title" id="thread3-title">Monthly prompt: write the opening line of a novel set in a dying city</div><div class="thread-meta">Active · <span>17 replies</span></div></div>
+      <div class="thread"><div class="thread-title" id="thread4-title">Recommended podcasts on the craft of writing</div><div class="thread-meta">Resource · <span>8 replies</span></div></div>
+    </div>
+  </section>
+
+  <!-- ARCELIO'S NOVELS -->
+  <section id="writers">
+    <div class="ornament">— ✦ —</div>
+    <div class="section-head">
+      <span class="section-icon">🪶</span>
+      <h2>Arcelio's Novels</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="prose">
+      <p id="el-writers-desc">Monthly voice chats in Discord where a community member shares their work-in-progress, their process, or a craft essay they love. Next session listed below.</p>
+    </div>
+    <div id="writer-list">
+      <div class="talk">
+        <div class="talk-avatar" id="talk1-avatar-wrap"><img id="talk1-img" src="" style="display:none"><span id="talk1-emoji">🖋</span></div>
+        <div>
+          <div class="talk-name" id="talk1-name">Serafina Vael</div>
+          <div class="talk-topic" id="talk1-topic">On writing non-linear timelines without losing the reader</div>
+          <div class="talk-desc" id="talk1-desc">June 14 · 8 PM EST · #writer-stage</div>
+        </div>
+      </div>
+      <div class="talk">
+        <div class="talk-avatar" id="talk2-avatar-wrap"><img id="talk2-img" src="" style="display:none"><span id="talk2-emoji">🖋</span></div>
+        <div>
+          <div class="talk-name" id="talk2-name">Dorian Marsh</div>
+          <div class="talk-topic" id="talk2-topic">First chapters: the quiet contract with the reader</div>
+          <div class="talk-desc" id="talk2-desc">July 5 · 8 PM EST · #writer-stage</div>
+        </div>
+      </div>
+      <div class="talk">
+        <div class="talk-avatar" id="talk3-avatar-wrap"><img id="talk3-img" src="" style="display:none"><span id="talk3-emoji">🖋</span></div>
+        <div>
+          <div class="talk-name" id="talk3-name">Lyra Ashbourne</div>
+          <div class="talk-topic" id="talk3-topic">The villain who is right: moral complexity in antagonists</div>
+          <div class="talk-desc" id="talk3-desc">August 2 · 8 PM EST · #writer-stage</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="ornament">— ✦ —</div>
+    <div class="section-head">
+      <h2>About This Place</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="prose">
+      <p id="el-about-text">The Lamplit Nook is a small Discord community for people who read seriously, write earnestly, and like to build things together — in Minecraft and on the page. No algorithms. No hustle. Just good conversation.</p>
+      <p id="el-about-text2">We try to stay small enough that everyone knows each other's name.</p>
+    </div>
+    <div class="img-placeholder" id="about-img-wrap" style="margin-top:1rem;max-width:100%">
+      <img id="about-img" src="" style="display:none">
+      <span id="about-img-placeholder-text">[ Banner / Community Art ]</span>
+    </div>
+  </section>
+
+  <footer>
+    <span id="el-footer">The Lamplit Nook · Est. 2024 · Built with care, not code</span>
+  </footer>
+
+</div>
+
+<!-- EDITOR TOGGLE (always visible) -->
+<button class="editor-toggle" id="editor-toggle-btn" onclick="requestEditorOpen()">✎ Edit Site</button>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-backdrop" id="pw-modal">
+  <div class="modal-box">
+    <div class="modal-title">&#128274; Creator Access</div>
+    <div class="modal-sub">This editor is restricted to the site's creator.</div>
+    <div class="modal-error" id="pw-error">Incorrect passphrase. Try again.</div>
+    <input class="modal-input" type="password" id="pw-input" placeholder="&#9670; passphrase &#9670;" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="modal-btn" onclick="checkPassword()">Enter</button>
+    <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- EDITOR PANEL -->
+<div class="editor-panel" id="editor-panel">
+  <div class="editor-header">
+    <h3>✎ Site Editor</h3>
+    <div class="editor-header-right">
+      <button class="lock-btn" onclick="lockEditor()" title="Lock editor">&#128274; Lock</button>
+      <button class="editor-close" onclick="closeEditorPanel()">✕</button>
+    </div>
+  </div>
+  <div class="editor-tabs">
+    <button class="etab active" onclick="switchTab('general',this)">General</button>
+    <button class="etab" onclick="switchTab('minecraft',this)">Realm</button>
+    <button class="etab" onclick="switchTab('books',this)">Library</button>
+    <button class="etab" onclick="switchTab('forum',this)">Threads</button>
+    <button class="etab" onclick="switchTab('writers',this)">Novels</button>
+    <button class="etab" onclick="switchTab('images',this)">Images</button>
+  </div>
+  <div class="editor-body">
+
+    <!-- GENERAL -->
+    <div class="tab-section active" id="tab-general">
+      <div class="field-group"><label class="field-label">Site Title</label><input class="field-input" id="in-title" value="The Lamplit Nook" oninput="live('el-site-title',this.value)"></div>
+      <div class="field-group"><label class="field-label">Tagline</label><input class="field-input" id="in-tagline" value="A quiet corner of the internet for readers, writers, and wanderers" oninput="live('el-site-tagline',this.value)"></div>
+      <div class="field-group"><label class="field-label">Discord Invite URL</label><input class="field-input" id="in-discord" placeholder="https://discord.gg/..."></div>
+      <div class="field-group"><label class="field-label">Footer Text</label><input class="field-input" id="in-footer" value="The Lamplit Nook · Est. 2024 · Built with care, not code" oninput="live('el-footer',this.value)"></div>
+    </div>
+
+    <!-- MINECRAFT -->
+    <div class="tab-section" id="tab-minecraft">
+      <div class="field-group"><label class="field-label">Description</label><textarea class="field-textarea" id="in-mc-desc" oninput="live('el-mc-desc',this.value)">A survival world with light roleplay, shared builds, and a ban on griefing. Come build something that lasts. Whitelist granted in #the-gatehouse on Discord.</textarea></div>
+      <div class="field-group"><label class="field-label">Server IP</label><input class="field-input" id="in-mc-ip" value="play.lampletnook.net" oninput="live('el-mc-ip',this.value)"></div>
+      <div class="field-group"><label class="field-label">Version</label><input class="field-input" id="in-mc-version" value="Java 1.21" oninput="live('el-mc-version',this.value)"></div>
+      <div class="field-group"><label class="field-label">Mode</label><input class="field-input" id="in-mc-mode" value="Survival / Light Roleplay" oninput="live('el-mc-mode',this.value)"></div>
+      <div class="field-group"><label class="field-label">Rule I</label><input class="field-input" id="in-mc-r1" value="No Griefing" oninput="live('el-mc-r1',this.value)"></div>
+      <div class="field-group"><label class="field-label">Rule II</label><input class="field-input" id="in-mc-r2" value="Whitelist Only" oninput="live('el-mc-r2',this.value)"></div>
+      <div class="field-group"><label class="field-label">Rule III</label><input class="field-input" id="in-mc-r3" value="Stay in Character" oninput="live('el-mc-r3',this.value)"></div>
+    </div>
+
+    <!-- BOOKS -->
+    <div class="tab-section" id="tab-books">
+      <div class="field-group"><label class="field-label">Section Intro</label><textarea class="field-textarea" oninput="live('el-books-desc',this.value)">Curated by the community. These are the volumes that have shaped our conversations, our worlds, and the way we write.</textarea></div>
+      <div class="ornament" style="font-size:0.7rem;letter-spacing:.1rem;margin:.5rem 0;">Book 1</div>
+      <div class="field-group"><label class="field-label">Title</label><input class="field-input" value="The Name of the Wind" oninput="live('book1-title',this.value)"></div>
+      <div class="field-group"><label class="field-label">Author</label><input class="field-input" value="Patrick Rothfuss" oninput="live('book1-author',this.value)"></div>
+      <div class="field-group"><label class="field-label">Note</label><input class="field-input" value="Prose like a scalpel. The best first-person narrator in modern fantasy." oninput="live('book1-note',this.value)"></div>
+      <div class="ornament" style="font-size:0.7rem;letter-spacing:.1rem;margin:.5rem 0;">Book 2</div>
+      <div class="field-group"><label class="field-label">Title</label><input class="field-input" value="A Gentleman in Moscow" oninput="live('book2-title',this.value)"></div>
+      <div class="field-group"><label class="field-label">Author</label><input class="field-input" value="Amor Towles" oninput="live('book2-author',this.value)"></div>
+      <div class="field-group"><label class="field-label">Note</label><input class="field-input" value="On finding a full life within constraint. Graceful and unhurried." oninput="live('book2-note',this.value)"></div>
+      <div class="ornament" style="font-size:0.7rem;letter-spacing:.1rem;margin:.5rem 0;">Book 3</div>
+      <div class="field-group"><label class="field-label">Title</label><input class="field-input" value="The Left Hand of Darkness" oninput="live('book3-title',this.value)"></div>
+      <div class="field-group"><label class="field-label">Author</label><input class="field-input" value="Ursula K. Le Guin" oninput="live('book3-author',this.value)"></div>
+      <div class="field-group"><label class="field-label">Note</label><input class="field-input" value="Still the most quietly radical speculative novel ever written." oninput="live('book3-note',this.value)"></div>
+    </div>
+
+    <!-- FORUM -->
+    <div class="tab-section" id="tab-forum">
+      <div class="field-group"><label class="field-label">Section Intro</label><textarea class="field-textarea" oninput="live('el-forum-desc',this.value)">Live threads happen in Discord. These are the evergreen topics pinned here for newcomers to find their footing.</textarea></div>
+      <div class="ornament" style="font-size:0.7rem;letter-spacing:.1rem;margin:.5rem 0;">Threads</div>
+      <div class="field-group"><label class="field-label">Thread 1</label><input class="field-input" value="What made you fall in love with fantasy as a genre?" oninput="live('thread1-title',this.value)"></div>
+      <div class="field-group"><label class="field-label">Thread 2</label><input class="field-input" value="Map-making: share your world maps, critique welcome" oninput="live('thread2-title',this.value)"></div>
+      <div class="field-group"><label class="field-label">Thread 3</label><input class="field-input" value="Monthly prompt: write the opening line of a novel set in a dying city" oninput="live('thread3-title',this.value)"></div>
+      <div class="field-group"><label class="field-label">Thread 4</label><input class="field-input" value="Recommended podcasts on the craft of writing" oninput="live('thread4-title',this.value)"></div>
+    </div>
+
+    <!-- WRITERS -->
+    <div class="tab-section" id="tab-writers">
+      <div class="field-group"><label class="field-label">Section Intro</label><textarea class="field-textarea" oninput="live('el-writers-desc',this.value)">Monthly voice chats in Discord where a community member shares their work-in-progress, their process, or a craft essay they love. Next session listed below.</textarea></div>
+      <div class="ornament" style="font-size:0.7rem;letter-spacing:.1rem;margin:.5rem 0;">Entry 1</div>
+      <div class="field-group"><label class="field-label">Name</label><input class="field-input" value="Serafina Vael" oninput="live('talk1-name',this.value)"></div>
+      <div class="field-group"><label class="field-label">Topic / Title</label><input class="field-input" value="On writing non-linear timelines without losing the reader" oninput="live('talk1-topic',this.value)"></div>
+      <div class="field-group"><label class="field-label">Date / Channel</label><input class="field-input" value="June 14 · 8 PM EST · #writer-stage" oninput="live('talk1-desc',this.value)"></div>
+      <div class="ornament" style="font-size:0.7rem;letter-spacing:.1rem;margin:.5rem 0;">Entry 2</div>
+      <div class="field-group"><label class="field-label">Name</label><input class="field-input" value="Dorian Marsh" oninput="live('talk2-name',this.value)"></div>
+      <div class="field-group"><label class="field-label">Topic / Title</label><input class="field-input" value="First chapters: the quiet contract with the reader" oninput="live('talk2-topic',this.value)"></div>
+      <div class="field-group"><label class="field-label">Date / Channel</label><input class="field-input" value="July 5 · 8 PM EST · #writer-stage" oninput="live('talk2-desc',this.value)"></div>
+      <div class="ornament" style="font-size:0.7rem;letter-spacing:.1rem;margin:.5rem 0;">Entry 3</div>
+      <div class="field-group"><label class="field-label">Name</label><input class="field-input" value="Lyra Ashbourne" oninput="live('talk3-name',this.value)"></div>
+      <div class="field-group"><label class="field-label">Topic / Title</label><input class="field-input" value="The villain who is right: moral complexity in antagonists" oninput="live('talk3-topic',this.value)"></div>
+      <div class="field-group"><label class="field-label">Date / Channel</label><input class="field-input" value="August 2 · 8 PM EST · #writer-stage" oninput="live('talk3-desc',this.value)"></div>
+    </div>
+
+    <!-- IMAGES -->
+    <div class="tab-section" id="tab-images">
+      <div class="img-guide">Upload images from your device or paste a direct URL below.</div>
+      <div style="margin-top:1rem"><div class="field-label">Minecraft Server Screenshot</div><label class="img-upload-btn">&#11014; Upload<input type="file" accept="image/*" onchange="loadImg(this,'mc-img','mc-img-placeholder-text')"></label></div>
+      <div style="margin-top:0.8rem"><div class="field-label">Book 1 Cover</div><label class="img-upload-btn">&#11014; Upload<input type="file" accept="image/*" onchange="loadImg(this,'book1-img','book1-emoji')"></label></div>
+      <div style="margin-top:0.6rem"><div class="field-label">Book 2 Cover</div><label class="img-upload-btn">&#11014; Upload<input type="file" accept="image/*" onchange="loadImg(this,'book2-img','book2-emoji')"></label></div>
+      <div style="margin-top:0.6rem"><div class="field-label">Book 3 Cover</div><label class="img-upload-btn">&#11014; Upload<input type="file" accept="image/*" onchange="loadImg(this,'book3-img','book3-emoji')"></label></div>
+      <div style="margin-top:0.8rem"><div class="field-label">Novel Entry 1 — Avatar</div><label class="img-upload-btn">&#11014; Upload<input type="file" accept="image/*" onchange="loadImg(this,'talk1-img','talk1-emoji')"></label></div>
+      <div style="margin-top:0.6rem"><div class="field-label">Novel Entry 2 — Avatar</div><label class="img-upload-btn">&#11014; Upload<input type="file" accept="image/*" onchange="loadImg(this,'talk2-img','talk2-emoji')"></label></div>
+      <div style="margin-top:0.6rem"><div class="field-label">Novel Entry 3 — Avatar</div><label class="img-upload-btn">&#11014; Upload<input type="file" accept="image/*" onchange="loadImg(this,'talk3-img','talk3-emoji')"></label></div>
+      <div style="margin-top:0.8rem"><div class="field-label">About / Banner</div><label class="img-upload-btn">&#11014; Upload<input type="file" accept="image/*" onchange="loadImg(this,'about-img','about-img-placeholder-text')"></label></div>
+
+      <div class="img-guide" style="margin-top:1rem">
+        <strong style="color:var(--smoke)">Or paste an image URL:</strong><br><br>
+        <select class="field-input" id="url-img-slot" style="margin-bottom:.4rem">
+          <option value="mc-img|mc-img-placeholder-text">Server Screenshot</option>
+          <option value="book1-img|book1-emoji">Book 1 Cover</option>
+          <option value="book2-img|book2-emoji">Book 2 Cover</option>
+          <option value="book3-img|book3-emoji">Book 3 Cover</option>
+          <option value="talk1-img|talk1-emoji">Entry 1 Avatar</option>
+          <option value="talk2-img|talk2-emoji">Entry 2 Avatar</option>
+          <option value="talk3-img|talk3-emoji">Entry 3 Avatar</option>
+          <option value="about-img|about-img-placeholder-text">About Banner</option>
+        </select>
+        <input class="field-input" id="url-img-input" placeholder="https://example.com/image.jpg" style="margin-bottom:.4rem">
+        <button class="apply-btn" onclick="loadImgFromUrl()">Apply Image URL</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── PASSWORD ──────────────────────────────────────────────────────────────
+  // Change this to your own passphrase before sharing the site.
+  const CREATOR_PASSWORD = 'lamplit2024';
+
+  let editorUnlocked = false;
+
+  function requestEditorOpen() {
+    if (editorUnlocked) {
+      openEditorPanel();
+    } else {
+      document.getElementById('pw-modal').classList.add('open');
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-error').classList.remove('show');
+      setTimeout(() => document.getElementById('pw-input').focus(), 80);
+    }
+  }
+
+  function checkPassword() {
+    const val = document.getElementById('pw-input').value;
+    if (val === CREATOR_PASSWORD) {
+      editorUnlocked = true;
+      closeModal();
+      openEditorPanel();
+    } else {
+      document.getElementById('pw-error').classList.add('show');
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('pw-modal').classList.remove('open');
+  }
+
+  function openEditorPanel() {
+    document.getElementById('editor-panel').classList.add('open');
+    document.getElementById('editor-toggle-btn').textContent = '✕ Close Editor';
+  }
+
+  function closeEditorPanel() {
+    document.getElementById('editor-panel').classList.remove('open');
+    document.getElementById('editor-toggle-btn').textContent = '✎ Edit Site';
+  }
+
+  function lockEditor() {
+    editorUnlocked = false;
+    closeEditorPanel();
+  }
+
+  // ── EDITOR HELPERS ────────────────────────────────────────────────────────
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.etab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+  function live(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  function loadImg(input, imgId, placeholderId) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById(imgId);
+      const ph = document.getElementById(placeholderId);
+      if (img) { img.src = e.target.result; img.style.display = 'block'; }
+      if (ph) ph.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function loadImgFromUrl() {
+    const parts = document.getElementById('url-img-slot').value.split('|');
+    const url = document.getElementById('url-img-input').value.trim();
+    if (!url) return;
+    const img = document.getElementById(parts[0]);
+    const ph = document.getElementById(parts[1]);
+    if (img) { img.src = url; img.style.display = 'block'; }
+    if (ph) ph.style.display = 'none';
+  }
+</script>
+</body>
+</html>
